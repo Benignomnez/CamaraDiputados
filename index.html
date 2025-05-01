@@ -1,0 +1,2696 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Galería de Remodelación - Hastial</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.0.0/css/all.min.css"
+    />
+    <style>
+      :root {
+        --primary-gray: #4a5568;
+        --light-gray: #e2e8f0;
+        --off-white: #f7fafc;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--off-white);
+        color: var(--primary-gray);
+      }
+      .logo-placeholder {
+        background-color: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 4px;
+      }
+      .section-title {
+        position: relative;
+        margin-bottom: 1.5rem;
+      }
+      .section-title:after {
+        content: "";
+        position: absolute;
+        left: 0;
+        bottom: -8px;
+        width: 60px;
+        height: 3px;
+        background-color: var(--primary-gray);
+      }
+      .comparison-container {
+        position: relative;
+        width: 100%;
+        height: 400px;
+        overflow: hidden;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .before-image,
+      .after-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: var(--light-gray);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-gray);
+        font-size: 1.2rem;
+        background-size: cover;
+        background-position: center;
+      }
+      .before-image {
+        z-index: 1;
+      }
+      .comparison-slider {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 50%;
+        width: 4px;
+        background-color: white;
+        z-index: 3;
+        cursor: ew-resize;
+        transform: translateX(-2px);
+      }
+      .comparison-slider::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 40px;
+        height: 40px;
+        background-color: white;
+        border-radius: 50%;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .comparison-slider-arrows {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 4;
+        pointer-events: none;
+      }
+      .comparison-slider-arrows i {
+        background-color: rgba(255, 255, 255, 0.85);
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        pointer-events: auto;
+        margin: 0 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        z-index: 10; /* Ensure the arrows are clickable */
+        font-size: 18px;
+        color: #333;
+      }
+      .comparison-slider-arrows i:hover {
+        background-color: white;
+        transform: scale(1.15);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.4);
+        color: #000;
+      }
+      .before-image-clip {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        overflow: hidden;
+        z-index: 2;
+      }
+      .zone-thumbnail {
+        width: 100%;
+        height: 80px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+        margin-bottom: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .zone-thumbnail:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+      }
+      .zone-thumbnail.active {
+        border: 3px solid var(--primary-gray);
+      }
+      .zone-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .zone-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px;
+        font-size: 0.8rem;
+        text-align: center;
+      }
+      .image-tag {
+        position: absolute;
+        padding: 4px 12px;
+        color: white;
+        font-weight: bold;
+        z-index: 5;
+        border-radius: 20px;
+      }
+      .before-tag {
+        top: 15px;
+        left: 15px;
+        background-color: rgba(74, 85, 104, 0.8);
+      }
+      .after-tag {
+        top: 15px;
+        right: 15px;
+        background-color: rgba(74, 85, 104, 0.8);
+      }
+      .thumbnail-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .pair-thumbnail {
+        width: 100%;
+        height: 70px;
+        background-color: var(--light-gray);
+        border-radius: 4px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+      .pair-thumbnail:hover {
+        transform: scale(1.05);
+      }
+      .pair-thumbnail.active {
+        border: 2px solid var(--primary-gray);
+      }
+      .pair-thumbnail:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 50%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.1);
+        z-index: 1;
+      }
+      .testimonial {
+        background-color: white;
+        border-left: 4px solid var(--primary-gray);
+        padding: 20px;
+        font-style: italic;
+        margin: 30px 0;
+        border-radius: 0 4px 4px 0;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .zone-description {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+      .image-gallery {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .gallery-item {
+        flex: 0 0 calc(33.333% - 10px);
+        height: 150px;
+        background-size: cover;
+        background-position: center;
+        border-radius: 4px;
+        position: relative;
+        overflow: hidden;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      .gallery-item:hover {
+        transform: scale(1.03);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+      .gallery-item-label {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 5px;
+        font-size: 0.75rem;
+        text-align: center;
+      }
+      .gallery-navigation {
+        display: flex;
+        justify-content: center;
+        margin: 15px 0;
+      }
+      .gallery-nav-button {
+        background-color: var(--primary-gray);
+        color: white;
+        border: none;
+        padding: 5px 15px;
+        margin: 0 5px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: background-color 0.3s;
+      }
+      .gallery-nav-button:hover {
+        background-color: #2d3748;
+      }
+      .gallery-nav-button.active {
+        background-color: #2b6cb0;
+      }
+      /* Lightbox styles */
+      .lightbox {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.3s, visibility 0.3s;
+      }
+      .lightbox.open {
+        opacity: 1;
+        visibility: visible;
+      }
+      .lightbox-content {
+        position: relative;
+        max-width: 90%;
+        max-height: 90%;
+        margin: auto;
+      }
+      .lightbox-image {
+        max-width: 100%;
+        max-height: 90vh;
+        display: block;
+        margin: 0 auto;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        border-radius: 4px;
+      }
+      .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        color: white;
+        font-size: 30px;
+        cursor: pointer;
+        z-index: 1001;
+      }
+      .lightbox-caption {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background-color: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px;
+        text-align: center;
+        font-size: 1rem;
+      }
+      .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        transform: translateY(-50%);
+        z-index: 1001;
+      }
+      .lightbox-nav-btn {
+        color: white;
+        font-size: 30px;
+        background: rgba(0, 0, 0, 0.5);
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        cursor: pointer;
+        margin: 0 20px;
+        transition: background-color 0.3s;
+      }
+      .lightbox-nav-btn:hover {
+        background-color: rgba(0, 0, 0, 0.8);
+      }
+      .zoom-hint {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: rgba(0, 0, 0, 0.5);
+        color: white;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        opacity: 0.6;
+      }
+      .zoom-hint:hover {
+        opacity: 1;
+        transform: scale(1.1);
+      }
+      .pair-counter {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 12px;
+        z-index: 5;
+      }
+      @media print {
+        .zone-thumbnail,
+        .pair-thumbnail {
+          break-inside: avoid;
+        }
+        .comparison-container {
+          break-inside: avoid;
+          height: 300px;
+        }
+        .page-break {
+          page-break-after: always;
+        }
+      }
+      @media (max-width: 768px) {
+        .gallery-item {
+          flex: 0 0 calc(50% - 10px);
+        }
+        .lightbox-nav-btn {
+          width: 40px;
+          height: 40px;
+          font-size: 24px;
+          margin: 0 10px;
+        }
+        .lightbox-content {
+          max-width: 95%;
+        }
+      }
+    </style>
+  </head>
+  <body class="pb-12">
+    <header class="bg-white shadow-md py-4 mb-6">
+      <div class="container mx-auto px-4">
+        <div class="flex justify-between items-center">
+          <div class="logo-placeholder h-16 w-40">Logo Hastial</div>
+          <div class="logo-placeholder h-16 w-48">
+            Logo Cámara de Diputados RD
+          </div>
+        </div>
+        <div class="mt-6 text-center">
+          <h1 class="text-3xl font-bold text-gray-800">
+            Proyecto de Remodelación
+          </h1>
+          <p class="text-lg text-gray-600 mt-2">
+            Departamento de Compras y Contrataciones - Cámara de Diputados de la
+            República Dominicana
+          </p>
+          <!-- Enlaces rápidos a las galerías -->
+          <div class="mt-4 flex justify-center space-x-4">
+            <a
+              href="#todas-imagenes-antes"
+              id="enlace-todas-antes"
+              class="inline-block bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
+            >
+              Imágenes Antes
+            </a>
+            <a
+              href="#todas-imagenes-despues"
+              id="enlace-todas-despues"
+              class="inline-block bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-6 rounded-full transition-colors duration-300"
+            >
+              Imágenes Después
+            </a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="container mx-auto px-4">
+      <div class="flex flex-col md:flex-row md:space-x-6">
+        <!-- Sidebar / Zone Navigation -->
+        <div class="md:w-1/4">
+          <h2 class="section-title text-xl font-bold mb-4">
+            Áreas del Proyecto
+          </h2>
+          <div class="zone-list">
+            <div class="zone-thumbnail active" data-zone="recepcion">
+              <div class="relative h-full">
+                <div class="zone-title">Área de Recepción</div>
+              </div>
+            </div>
+            <div class="zone-thumbnail" data-zone="oficinas">
+              <div class="relative h-full">
+                <div class="zone-title">Oficinas Comunes</div>
+              </div>
+            </div>
+            <div class="zone-thumbnail" data-zone="oficinas_principales">
+              <div class="relative h-full">
+                <div class="zone-title">Oficinas Principales</div>
+              </div>
+            </div>
+            <div class="zone-thumbnail" data-zone="cocina">
+              <div class="relative h-full">
+                <div class="zone-title">Cocina</div>
+              </div>
+            </div>
+            <div class="zone-thumbnail" data-zone="archivo">
+              <div class="relative h-full">
+                <div class="zone-title">Área de Archivo</div>
+              </div>
+            </div>
+            <div class="zone-thumbnail" data-zone="pasillo">
+              <div class="relative h-full">
+                <div class="zone-title">Pasillos y Áreas Comunes</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-8">
+            <h3 class="font-bold mb-2">Aspectos Destacados</h3>
+            <ul class="list-disc pl-5 space-y-1 text-sm">
+              <li>Diseño Funcional</li>
+              <li>Iluminación Mejorada</li>
+              <li>Materiales de Alta Calidad</li>
+              <li>Sistemas de Climatización</li>
+              <li>Mobiliario Ergonómico</li>
+              <li>Tecnología Integrada</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="md:w-3/4 mt-6 md:mt-0">
+          <div class="zone-content" id="recepcion">
+            <h2 class="section-title text-2xl font-bold">Área de Recepción</h2>
+
+            <!-- Before/After Comparison -->
+            <div class="comparison-container">
+              <div class="image-tag before-tag">ANTES</div>
+              <div class="image-tag after-tag">DESPUÉS</div>
+
+              <div class="after-image">Imagen DESPUÉS de la remodelación</div>
+
+              <div class="before-image-clip">
+                <div class="before-image">Imagen ANTES de la remodelación</div>
+              </div>
+
+              <div class="comparison-slider">
+                <div class="comparison-slider-arrows">
+                  <i class="fas fa-chevron-left"></i>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="zone-description">
+              <h3 class="font-bold mb-2">Descripción de la Transformación</h3>
+              <p>
+                El área de recepción ha sido completamente rediseñada para crear
+                un espacio más acogedor y funcional. Se implementó un mostrador
+                moderno con el logo institucional, se mejoraron los sistemas de
+                iluminación y se instaló un área de espera cómoda para
+                visitantes.
+              </p>
+
+              <h3 class="font-bold mt-4 mb-2">Características Principales</h3>
+              <ul class="list-disc pl-5">
+                <li>Mostrador de recepción ergonómico</li>
+                <li>Sistema de iluminación LED de bajo consumo</li>
+                <li>Asientos cómodos para visitantes</li>
+                <li>Señalización digital</li>
+                <li>Acabados de alta calidad en tonos institucionales</li>
+              </ul>
+            </div>
+
+            <!-- Gallery Navigation Buttons -->
+            <div class="gallery-navigation mt-6">
+              <button class="gallery-nav-button active" data-view="comparison">
+                Comparación
+              </button>
+              <button class="gallery-nav-button" data-view="before">
+                Imágenes Antes
+              </button>
+              <button class="gallery-nav-button" data-view="after">
+                Imágenes Después
+              </button>
+            </div>
+
+            <!-- Image Pair Thumbnails -->
+            <h3 class="font-bold mt-6 mb-3">Vistas disponibles</h3>
+            <div class="thumbnail-container">
+              <div class="pair-thumbnail active" data-pair="1">
+                <div class="zone-title text-xs">Vista Principal</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="2">
+                <div class="zone-title text-xs">Área de Espera</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="3">
+                <div class="zone-title text-xs">Vista Adicional</div>
+              </div>
+              <!-- Thumbnails se generarán dinámicamente -->
+            </div>
+
+            <!-- Image Gallery for Before Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="recepcion-before-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+
+            <!-- Image Gallery for After Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="recepcion-after-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+          </div>
+
+          <!-- Hidden Content for Other Zones -->
+          <div class="zone-content hidden" id="oficinas">
+            <h2 class="section-title text-2xl font-bold">Oficinas Comunes</h2>
+            <!-- Similar structure as above -->
+            <div class="comparison-container">
+              <div class="image-tag before-tag">ANTES</div>
+              <div class="image-tag after-tag">DESPUÉS</div>
+
+              <div class="after-image">Imagen DESPUÉS de la remodelación</div>
+
+              <div class="before-image-clip">
+                <div class="before-image">Imagen ANTES de la remodelación</div>
+              </div>
+
+              <div class="comparison-slider">
+                <div class="comparison-slider-arrows">
+                  <i class="fas fa-chevron-left"></i>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="zone-description">
+              <h3 class="font-bold mb-2">Descripción de la Transformación</h3>
+              <p>
+                Las oficinas comunes han sido rediseñadas con un enfoque en la
+                eficiencia y confort. Se implementaron divisiones modernas,
+                estaciones de trabajo ergonómicas y sistemas de climatización
+                optimizados para mejorar la productividad del personal.
+              </p>
+
+              <h3 class="font-bold mt-4 mb-2">Características Principales</h3>
+              <ul class="list-disc pl-5">
+                <li>Distribución optimizada del espacio</li>
+                <li>Mobiliario ergonómico</li>
+                <li>Sistemas de climatización eficientes</li>
+                <li>Iluminación natural maximizada</li>
+                <li>Acústica mejorada para reducción de ruido</li>
+              </ul>
+            </div>
+
+            <!-- Gallery Navigation Buttons -->
+            <div class="gallery-navigation mt-6">
+              <button class="gallery-nav-button active" data-view="comparison">
+                Comparación
+              </button>
+              <button class="gallery-nav-button" data-view="before">
+                Imágenes Antes
+              </button>
+              <button class="gallery-nav-button" data-view="after">
+                Imágenes Después
+              </button>
+            </div>
+
+            <h3 class="font-bold mt-6 mb-3">Vistas adicionales de esta área</h3>
+            <div class="thumbnail-container">
+              <div class="pair-thumbnail active" data-pair="1">
+                <div class="zone-title text-xs">Vista General</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="2">
+                <div class="zone-title text-xs">Estaciones de Trabajo</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="3">
+                <div class="zone-title text-xs">Oficina Director</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="4">
+                <div class="zone-title text-xs">Áreas Comunes</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="5">
+                <div class="zone-title text-xs">Detalles</div>
+              </div>
+            </div>
+
+            <!-- Image Gallery for Before Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="oficinas-before-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+
+            <!-- Image Gallery for After Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="oficinas-after-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+          </div>
+
+          <!-- Similar structure for other zones (cocina, archivo, pasillo) -->
+          <!-- These would be hidden until selected -->
+
+          <div class="zone-content hidden" id="cocina">
+            <h2 class="section-title text-2xl font-bold">Cocina</h2>
+
+            <!-- Before/After Comparison -->
+            <div class="comparison-container">
+              <div class="image-tag before-tag">ANTES</div>
+              <div class="image-tag after-tag">DESPUÉS</div>
+
+              <div class="after-image">Imagen DESPUÉS de la remodelación</div>
+
+              <div class="before-image-clip">
+                <div class="before-image">Imagen ANTES de la remodelación</div>
+              </div>
+
+              <div class="comparison-slider">
+                <div class="comparison-slider-arrows">
+                  <i class="fas fa-chevron-left"></i>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="zone-description">
+              <h3 class="font-bold mb-2">Descripción de la Transformación</h3>
+              <p>
+                El área de la cocina ha sido completamente renovada para crear
+                un espacio más funcional y moderno. Se implementaron nuevos
+                equipamientos, mejoras en la distribución del espacio y
+                materiales de alta calidad para garantizar durabilidad y
+                facilidad de mantenimiento.
+              </p>
+
+              <h3 class="font-bold mt-4 mb-2">Características Principales</h3>
+              <ul class="list-disc pl-5">
+                <li>Nueva distribución del espacio</li>
+                <li>Equipamiento moderno</li>
+                <li>Iluminación mejorada</li>
+                <li>Superficies de fácil limpieza</li>
+                <li>Optimización de áreas de almacenamiento</li>
+              </ul>
+            </div>
+
+            <!-- Gallery Navigation Buttons -->
+            <div class="gallery-navigation mt-6">
+              <button class="gallery-nav-button active" data-view="comparison">
+                Comparación
+              </button>
+              <button class="gallery-nav-button" data-view="before">
+                Imágenes Antes
+              </button>
+              <button class="gallery-nav-button" data-view="after">
+                Imágenes Después
+              </button>
+            </div>
+
+            <!-- Image Pair Thumbnails -->
+            <h3 class="font-bold mt-6 mb-3">Vistas disponibles</h3>
+            <div class="thumbnail-container">
+              <!-- Thumbnails se generarán dinámicamente -->
+            </div>
+
+            <!-- Image Gallery for Before Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="cocina-before-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+
+            <!-- Image Gallery for After Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="cocina-after-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+          </div>
+
+          <div class="zone-content hidden" id="archivo">
+            <h2 class="section-title text-2xl font-bold">Área de Archivo</h2>
+
+            <!-- Before/After Comparison -->
+            <div class="comparison-container">
+              <div class="image-tag before-tag">ANTES</div>
+              <div class="image-tag after-tag">DESPUÉS</div>
+
+              <div class="after-image">Imagen DESPUÉS de la remodelación</div>
+
+              <div class="before-image-clip">
+                <div class="before-image">Imagen ANTES de la remodelación</div>
+              </div>
+
+              <div class="comparison-slider">
+                <div class="comparison-slider-arrows">
+                  <i class="fas fa-chevron-left"></i>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="zone-description">
+              <h3 class="font-bold mb-2">Descripción de la Transformación</h3>
+              <p>
+                El área de archivo ha sido completamente reorganizada para
+                optimizar el almacenamiento y la gestión de documentos. Se
+                implementaron sistemas modernos de archivo y se mejoró la
+                distribución del espacio para facilitar el acceso y mantener un
+                mejor orden de la documentación.
+              </p>
+
+              <h3 class="font-bold mt-4 mb-2">Características Principales</h3>
+              <ul class="list-disc pl-5">
+                <li>Sistema de archivo modular</li>
+                <li>Mejor organización de documentos</li>
+                <li>Iluminación adecuada para áreas de consulta</li>
+                <li>Estanterías de alta resistencia</li>
+                <li>Sistema de clasificación optimizado</li>
+              </ul>
+            </div>
+
+            <!-- Gallery Navigation Buttons -->
+            <div class="gallery-navigation mt-6">
+              <button class="gallery-nav-button active" data-view="comparison">
+                Comparación
+              </button>
+              <button class="gallery-nav-button" data-view="before">
+                Imágenes Antes
+              </button>
+              <button class="gallery-nav-button" data-view="after">
+                Imágenes Después
+              </button>
+            </div>
+
+            <!-- Image Pair Thumbnails -->
+            <h3 class="font-bold mt-6 mb-3">Vistas disponibles</h3>
+            <div class="thumbnail-container">
+              <!-- Thumbnails se generarán dinámicamente -->
+            </div>
+
+            <!-- Image Gallery for Before Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="archivo-before-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+
+            <!-- Image Gallery for After Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="archivo-after-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+          </div>
+
+          <div class="zone-content hidden" id="pasillo">
+            <h2 class="section-title text-2xl font-bold">
+              Pasillos y Áreas Comunes
+            </h2>
+
+            <!-- Before/After Comparison -->
+            <div class="comparison-container">
+              <div class="image-tag before-tag">ANTES</div>
+              <div class="image-tag after-tag">DESPUÉS</div>
+
+              <div class="after-image">Imagen DESPUÉS de la remodelación</div>
+
+              <div class="before-image-clip">
+                <div class="before-image">Imagen ANTES de la remodelación</div>
+              </div>
+
+              <div class="comparison-slider">
+                <div class="comparison-slider-arrows">
+                  <i class="fas fa-chevron-left"></i>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="zone-description">
+              <h3 class="font-bold mb-2">Descripción de la Transformación</h3>
+              <p>
+                Los pasillos y áreas comunes han sido completamente renovados
+                para crear espacios más funcionales y estéticamente agradables.
+                Se mejoró la iluminación, se cambiaron los acabados de pisos y
+                paredes, y se optimizó la circulación para facilitar el flujo de
+                personal y visitantes.
+              </p>
+
+              <h3 class="font-bold mt-4 mb-2">Características Principales</h3>
+              <ul class="list-disc pl-5">
+                <li>Nuevo sistema de iluminación</li>
+                <li>Acabados de alta calidad en pisos y paredes</li>
+                <li>Señalización clara y moderna</li>
+                <li>Optimización de espacios de circulación</li>
+                <li>Ambiente más acogedor y profesional</li>
+              </ul>
+            </div>
+
+            <!-- Gallery Navigation Buttons -->
+            <div class="gallery-navigation mt-6">
+              <button class="gallery-nav-button active" data-view="comparison">
+                Comparación
+              </button>
+              <button class="gallery-nav-button" data-view="before">
+                Imágenes Antes
+              </button>
+              <button class="gallery-nav-button" data-view="after">
+                Imágenes Después
+              </button>
+            </div>
+
+            <!-- Image Pair Thumbnails -->
+            <h3 class="font-bold mt-6 mb-3">Vistas disponibles</h3>
+            <div class="thumbnail-container">
+              <!-- Thumbnails se generarán dinámicamente -->
+            </div>
+
+            <!-- Image Gallery for Before Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="pasillo-before-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+
+            <!-- Image Gallery for After Images (Hidden by default) -->
+            <div class="image-gallery hidden" id="pasillo-after-gallery">
+              <!-- Será poblado por JavaScript -->
+            </div>
+          </div>
+
+          <!-- Similar structure for other zones (cocina, archivo, pasillo) -->
+          <!-- These would be hidden until selected -->
+
+          <div class="zone-content hidden" id="oficinas_principales">
+            <h2 class="section-title text-2xl font-bold">
+              Oficinas Principales
+            </h2>
+
+            <!-- Before/After Comparison -->
+            <div class="comparison-container">
+              <div class="image-tag before-tag">ANTES</div>
+              <div class="image-tag after-tag">DESPUÉS</div>
+
+              <div class="after-image">Imagen DESPUÉS de la remodelación</div>
+
+              <div class="before-image-clip">
+                <div class="before-image">Imagen ANTES de la remodelación</div>
+              </div>
+
+              <div class="comparison-slider">
+                <div class="comparison-slider-arrows">
+                  <i class="fas fa-chevron-left"></i>
+                  <i class="fas fa-chevron-right"></i>
+                </div>
+              </div>
+            </div>
+
+            <div class="zone-description">
+              <h3 class="font-bold mb-2">Descripción de la Transformación</h3>
+              <p>
+                Las oficinas principales fueron completamente renovadas para
+                proporcionar un ambiente ejecutivo moderno y funcional. Se
+                implementaron acabados de alta calidad, iluminación
+                especializada y sistemas de tecnología integrados para facilitar
+                las funciones de dirección y administración.
+              </p>
+
+              <h3 class="font-bold mt-4 mb-2">Características Principales</h3>
+              <ul class="list-disc pl-5">
+                <li>Espacios diseñados para reuniones ejecutivas</li>
+                <li>Acabados de lujo y materiales duraderos</li>
+                <li>Sistema de iluminación con control inteligente</li>
+                <li>Acústica optimizada para privacidad</li>
+                <li>Mobiliario ergonómico de alta gama</li>
+              </ul>
+            </div>
+
+            <!-- Gallery Navigation Buttons -->
+            <div class="gallery-navigation mt-6">
+              <button class="gallery-nav-button active" data-view="comparison">
+                Comparación
+              </button>
+              <button class="gallery-nav-button" data-view="before">
+                Imágenes Antes
+              </button>
+              <button class="gallery-nav-button" data-view="after">
+                Imágenes Después
+              </button>
+            </div>
+
+            <h3 class="font-bold mt-6 mb-3">Vistas adicionales de esta área</h3>
+            <div class="thumbnail-container">
+              <div class="pair-thumbnail active" data-pair="1">
+                <div class="zone-title text-xs">Vista General</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="2">
+                <div class="zone-title text-xs">Despacho Director</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="3">
+                <div class="zone-title text-xs">Sala de Juntas</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="4">
+                <div class="zone-title text-xs">Área de Asistentes</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="5">
+                <div class="zone-title text-xs">Recepción Privada</div>
+              </div>
+              <div class="pair-thumbnail" data-pair="6">
+                <div class="zone-title text-xs">Detalles Arquitectónicos</div>
+              </div>
+            </div>
+
+            <!-- Image Gallery for Before Images (Hidden by default) -->
+            <div
+              class="image-gallery hidden"
+              id="oficinas_principales-before-gallery"
+            >
+              <!-- Será poblado por JavaScript -->
+            </div>
+
+            <!-- Image Gallery for After Images (Hidden by default) -->
+            <div
+              class="image-gallery hidden"
+              id="oficinas_principales-after-gallery"
+            >
+              <!-- Será poblado por JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonial Section -->
+      <div class="testimonial mt-12">
+        <p>
+          "La transformación realizada por Hastial ha superado nuestras
+          expectativas. El espacio no solo luce moderno y profesional, sino que
+          ha mejorado significativamente nuestra eficiencia operativa y el
+          ambiente laboral."
+        </p>
+        <p class="mt-2 text-right font-semibold">- Director del Departamento</p>
+      </div>
+
+      <!-- Project Overview -->
+      <div class="mt-12">
+        <h2 class="section-title text-2xl font-bold">
+          Descripción General del Proyecto
+        </h2>
+        <div class="bg-white p-6 rounded-lg shadow-sm mt-4">
+          <p>
+            Este proyecto de remodelación llevado a cabo por Hastial ha
+            transformado completamente el Departamento de Compras y
+            Contrataciones de la Cámara de Diputados de la República Dominicana.
+            La renovación no solo modernizó el espacio físico, sino que también
+            optimizó la funcionalidad y eficiencia del área de trabajo para el
+            personal administrativo.
+          </p>
+          <p class="mt-4">
+            El objetivo principal fue crear un ambiente más productivo,
+            organizado y agradable visualmente, manteniendo al mismo tiempo la
+            sobriedad y profesionalismo que caracteriza a esta importante
+            institución.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold mb-2">Diseño Funcional</h3>
+              <p class="text-sm">
+                Reorganización completa del espacio para maximizar la eficiencia
+                y el flujo de trabajo, considerando las necesidades específicas
+                del departamento.
+              </p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold mb-2">Iluminación Mejorada</h3>
+              <p class="text-sm">
+                Implementación de un sistema de iluminación moderno que mejora
+                el ambiente de trabajo y reduce la fatiga visual del personal.
+              </p>
+            </div>
+            <div class="bg-gray-50 p-4 rounded-lg">
+              <h3 class="font-bold mb-2">Materiales de Alta Calidad</h3>
+              <p class="text-sm">
+                Utilización de materiales duraderos y de primera calidad que
+                garantizan la longevidad de la renovación y un bajo
+                mantenimiento.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Sección global de imágenes "Antes" -->
+    <section
+      id="todas-imagenes-antes"
+      class="hidden container mx-auto px-4 py-8"
+    >
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="section-title text-2xl font-bold">
+          Todas las Imágenes - Antes de la Remodelación
+        </h2>
+        <button
+          id="cerrar-todas-antes-flotante"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full shadow-md transition-all flex items-center text-base font-medium"
+        >
+          <i class="fas fa-arrow-left mr-2"></i> Volver al proyecto
+        </button>
+      </div>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        id="grid-todas-antes"
+      >
+        <!-- Se poblará dinámicamente con JS -->
+      </div>
+    </section>
+
+    <!-- Sección global de imágenes "Después" -->
+    <section
+      id="todas-imagenes-despues"
+      class="hidden container mx-auto px-4 py-8"
+    >
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="section-title text-2xl font-bold">
+          Todas las Imágenes - Después de la Remodelación
+        </h2>
+        <button
+          id="cerrar-todas-despues-flotante"
+          class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-full shadow-md transition-all flex items-center text-base font-medium"
+        >
+          <i class="fas fa-arrow-left mr-2"></i> Volver al proyecto
+        </button>
+      </div>
+      <div
+        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        id="grid-todas-despues"
+      >
+        <!-- Se poblará dinámicamente con JS -->
+      </div>
+    </section>
+
+    <footer class="mt-12 py-6 bg-gray-100">
+      <div class="container mx-auto px-4 text-center text-sm text-gray-600">
+        <p>© 2023 Hastial - Todos los derechos reservados</p>
+        <p class="mt-2">
+          Proyecto realizado para el Departamento de Compras y Contrataciones de
+          la Cámara de Diputados de la República Dominicana
+        </p>
+      </div>
+    </footer>
+
+    <!-- Lightbox Modal -->
+    <div class="lightbox" id="image-lightbox">
+      <div class="lightbox-close" id="lightbox-close">
+        <i class="fas fa-times"></i>
+      </div>
+      <div class="lightbox-content">
+        <img
+          src=""
+          alt="Imagen ampliada"
+          class="lightbox-image"
+          id="lightbox-image"
+        />
+        <div class="lightbox-caption" id="lightbox-caption"></div>
+      </div>
+      <div class="lightbox-nav">
+        <div class="lightbox-nav-btn" id="lightbox-prev">
+          <i class="fas fa-chevron-left"></i>
+        </div>
+        <div class="lightbox-nav-btn" id="lightbox-next">
+          <i class="fas fa-chevron-right"></i>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Data structure for all image information
+        const zoneImagesData = {
+          recepcion: {
+            before: [
+              {
+                id: "antes1",
+                file: "recepcion_antes.jpg",
+                title: "Vista Principal Antes",
+              },
+              {
+                id: "antes2",
+                file: "recepcion_antes2.jpg",
+                title: "Vista Secundaria Antes",
+              },
+            ],
+            after: [
+              {
+                id: "despues1",
+                file: "recepcion_despues3.jpg",
+                title: "Vista Principal Después",
+              },
+              {
+                id: "despues2",
+                file: "area_de_espera_despues.jpg",
+                title: "Área de Espera Después",
+              },
+              {
+                id: "despues3",
+                file: "area_recepcion4.jpg",
+                title: "Recepción Adicional",
+              },
+            ],
+            pairs: [
+              {
+                id: "1",
+                before: "recepcion_antes.jpg",
+                after: "recepcion_despues3.jpg",
+                title: "Vista Principal",
+              },
+              {
+                id: "2",
+                before: "recepcion_antes2.jpg",
+                after: "area_de_espera_despues.jpg",
+                title: "Área de Espera",
+              },
+              {
+                id: "3",
+                before: "recepcion_antes.jpg",
+                after: "area_recepcion4.jpg",
+                title: "Vista Adicional",
+              },
+              {
+                id: "4",
+                before: "recepcion_antes2.jpg",
+                after: "recepcion_despues3.jpg",
+                title: "Vista Alternativa 1",
+              },
+              {
+                id: "5",
+                before: "recepcion_antes.jpg",
+                after: "area_de_espera_despues.jpg",
+                title: "Vista Alternativa 2",
+              },
+              {
+                id: "6",
+                before: "recepcion_antes2.jpg",
+                after: "area_recepcion4.jpg",
+                title: "Vista Alternativa 3",
+              },
+            ],
+          },
+          oficinas: {
+            before: [
+              {
+                id: "antes1",
+                file: "oficinas_antes.jpg",
+                title: "Oficina Común - Vista Antes",
+              },
+              {
+                id: "antes2",
+                file: "oficinas_antes2.jpg",
+                title: "Oficinas - Vista Secundaria Antes",
+              },
+              {
+                id: "antes3",
+                file: "oficinas_antes3.jpg",
+                title: "Oficinas - Vista Adicional Antes",
+              },
+              {
+                id: "antes4",
+                file: "oficinas_antes (2).jpg",
+                title: "Oficinas - Vista Alternativa Antes",
+              },
+            ],
+            after: [
+              {
+                id: "despues1",
+                file: "oficinas_despues.jpg",
+                title: "Oficina Común - Vista Después",
+              },
+              {
+                id: "despues2",
+                file: "oficinas_despues1.jpg",
+                title: "Oficinas - Vista General Después",
+              },
+              {
+                id: "despues3",
+                file: "oficina-despues2.jpg",
+                title: "Oficinas - Estaciones de Trabajo",
+              },
+              {
+                id: "despues4",
+                file: "oficina_despues3.jpg",
+                title: "Oficinas - Oficina Director",
+              },
+              {
+                id: "despues5",
+                file: "oficina_despues4.jpg",
+                title: "Oficinas - Áreas Comunes",
+              },
+              {
+                id: "despues6",
+                file: "oficina_despues5.jpg",
+                title: "Oficinas - Detalles",
+              },
+            ],
+            pairs: [
+              {
+                id: "1",
+                before: "oficinas_antes.jpg",
+                after: "oficinas_despues.jpg",
+                title: "Vista General",
+              },
+              {
+                id: "2",
+                before: "oficinas_antes2.jpg",
+                after: "oficina-despues2.jpg",
+                title: "Estaciones de Trabajo",
+              },
+              {
+                id: "3",
+                before: "oficinas_antes3.jpg",
+                after: "oficina_despues3.jpg",
+                title: "Oficina Director",
+              },
+              {
+                id: "4",
+                before: "oficinas_antes (2).jpg",
+                after: "oficina_despues4.jpg",
+                title: "Áreas Comunes",
+              },
+              {
+                id: "5",
+                before: "oficinas_antes.jpg",
+                after: "oficina_despues5.jpg",
+                title: "Detalles",
+              },
+            ],
+          },
+          cocina: {
+            before: [
+              {
+                id: "antes1",
+                file: "cocina_antes.jpg",
+                title: "Cocina - Vista Principal Antes",
+              },
+              {
+                id: "antes2",
+                file: "cocina_antes2.jpg",
+                title: "Cocina - Vista Secundaria Antes",
+              },
+            ],
+            after: [
+              {
+                id: "despues1",
+                file: "cocina_despues1.jpg",
+                title: "Cocina - Vista Principal Después",
+              },
+              {
+                id: "despues2",
+                file: "cocina_despues2.jpg",
+                title: "Cocina - Vista Adicional 1",
+              },
+              {
+                id: "despues3",
+                file: "cocina_despues3.jpg",
+                title: "Cocina - Vista Adicional 2",
+              },
+              {
+                id: "despues4",
+                file: "cocina_despues4.jpg",
+                title: "Cocina - Vista Adicional 3",
+              },
+              {
+                id: "despues5",
+                file: "cocina_despues5.jpg",
+                title: "Cocina - Vista Adicional 4",
+              },
+            ],
+            pairs: [
+              {
+                id: "1",
+                before: "cocina_antes.jpg",
+                after: "cocina_despues1.jpg",
+                title: "Vista Principal",
+              },
+              {
+                id: "2",
+                before: "cocina_antes2.jpg",
+                after: "cocina_despues2.jpg",
+                title: "Vista Adicional 1",
+              },
+              {
+                id: "3",
+                before: "cocina_antes.jpg",
+                after: "cocina_despues3.jpg",
+                title: "Vista Adicional 2",
+              },
+              {
+                id: "4",
+                before: "cocina_antes2.jpg",
+                after: "cocina_despues4.jpg",
+                title: "Vista Adicional 3",
+              },
+              {
+                id: "5",
+                before: "cocina_antes.jpg",
+                after: "cocina_despues5.jpg",
+                title: "Vista Adicional 4",
+              },
+              {
+                id: "6",
+                before: "cocina_antes2.jpg",
+                after: "cocina_despues1.jpg",
+                title: "Vista Alternativa 1",
+              },
+              {
+                id: "7",
+                before: "cocina_antes.jpg",
+                after: "cocina_despues2.jpg",
+                title: "Vista Alternativa 2",
+              },
+              {
+                id: "8",
+                before: "cocina_antes2.jpg",
+                after: "cocina_despues3.jpg",
+                title: "Vista Alternativa 3",
+              },
+              {
+                id: "9",
+                before: "cocina_antes.jpg",
+                after: "cocina_despues4.jpg",
+                title: "Vista Alternativa 4",
+              },
+              {
+                id: "10",
+                before: "cocina_antes2.jpg",
+                after: "cocina_despues5.jpg",
+                title: "Vista Alternativa 5",
+              },
+            ],
+          },
+          archivo: {
+            before: [
+              {
+                id: "antes1",
+                file: "archivos_antes.jpg",
+                title: "Archivo - Vista Área de Archivo Antes",
+              },
+            ],
+            after: [
+              {
+                id: "despues1",
+                file: "archivos_despues.jpg",
+                title: "Archivo - Vista Área de Archivo Después",
+              },
+            ],
+            pairs: [
+              {
+                id: "1",
+                before: "archivos_antes.jpg",
+                after: "archivos_despues.jpg",
+                title: "Vista Área de Archivo",
+              },
+            ],
+          },
+          pasillo: {
+            before: [
+              {
+                id: "antes1",
+                file: "pasillos_antes.jpg",
+                title: "Pasillos y Áreas Comunes Antes",
+              },
+              {
+                id: "antes2",
+                file: "pasillos_antes1.jpg",
+                title: "Pasillos y Áreas Comunes Antes - Vista 2",
+              },
+            ],
+            after: [
+              {
+                id: "despues2",
+                file: "pasillos_despues2.jpg",
+                title: "Pasillos Después - Vista 1",
+              },
+              {
+                id: "despues3",
+                file: "pasillos_despues3.jpg",
+                title: "Pasillos Después - Vista 2",
+              },
+              {
+                id: "despues4",
+                file: "pasillos_despues4.jpg",
+                title: "Pasillos Después - Vista 3",
+              },
+            ],
+            pairs: [
+              {
+                id: "1",
+                before: "pasillos_antes.jpg",
+                after: "pasillos_despues2.jpg",
+                title: "Vista Principal",
+              },
+              {
+                id: "2",
+                before: "pasillos_antes1.jpg",
+                after: "pasillos_despues3.jpg",
+                title: "Vista Adicional 1",
+              },
+              {
+                id: "3",
+                before: "pasillos_antes.jpg",
+                after: "pasillos_despues4.jpg",
+                title: "Vista Adicional 2",
+              },
+              {
+                id: "4",
+                before: "pasillos_antes1.jpg",
+                after: "pasillos_despues2.jpg",
+                title: "Vista Adicional 3",
+              },
+              {
+                id: "5",
+                before: "pasillos_antes.jpg",
+                after: "pasillos_despues3.jpg",
+                title: "Vista Adicional 4",
+              },
+              {
+                id: "6",
+                before: "pasillos_antes1.jpg",
+                after: "pasillos_despues4.jpg",
+                title: "Vista Adicional 5",
+              },
+            ],
+          },
+          oficinas_principales: {
+            before: [
+              {
+                id: "antes1",
+                file: "oficina_principal_antes.jpg",
+                title: "Oficinas Principales - Vista General Antes",
+              },
+              {
+                id: "antes2",
+                file: "oficina_antes.jpg",
+                title: "Oficinas Principales - Despacho Antes",
+              },
+            ],
+            after: [
+              {
+                id: "despues1",
+                file: "oficina_principal_despues.jpg",
+                title: "Oficinas Principales - Vista General Después",
+              },
+              {
+                id: "despues2",
+                file: "oficina_principal_despues1.jpg",
+                title: "Oficinas Principales - Despacho Después",
+              },
+              {
+                id: "despues3",
+                file: "oficina_principal_despues2.jpg",
+                title: "Oficinas Principales - Sala de Juntas Después",
+              },
+              {
+                id: "despues4",
+                file: "oficiina_principal_despues3.jpg",
+                title: "Oficinas Principales - Área de Asistentes",
+              },
+              {
+                id: "despues5",
+                file: "oficina_principal_despues4.jpg",
+                title: "Oficinas Principales - Recepción Privada",
+              },
+              {
+                id: "despues6",
+                file: "oficina_principal_despues5.jpg",
+                title: "Oficinas Principales - Detalles Arquitectónicos",
+              },
+              {
+                id: "despues7",
+                file: "oficina_principal_despues6.jpg",
+                title: "Oficinas Principales - Vista Adicional",
+              },
+            ],
+            pairs: [
+              {
+                id: "1",
+                before: "oficina_principal_antes.jpg",
+                after: "oficina_principal_despues.jpg",
+                title: "Vista General",
+              },
+              {
+                id: "2",
+                before: "oficina_antes.jpg",
+                after: "oficina_principal_despues1.jpg",
+                title: "Despacho Director",
+              },
+              {
+                id: "3",
+                before: "oficina_principal_antes.jpg",
+                after: "oficina_principal_despues2.jpg",
+                title: "Sala de Juntas",
+              },
+              {
+                id: "4",
+                before: "oficina_antes.jpg",
+                after: "oficiina_principal_despues3.jpg",
+                title: "Área de Asistentes",
+              },
+              {
+                id: "5",
+                before: "oficina_principal_antes.jpg",
+                after: "oficina_principal_despues4.jpg",
+                title: "Recepción Privada",
+              },
+              {
+                id: "6",
+                before: "oficina_antes.jpg",
+                after: "oficina_principal_despues5.jpg",
+                title: "Detalles Arquitectónicos",
+              },
+              {
+                id: "7",
+                before: "oficina_principal_antes.jpg",
+                after: "oficina_principal_despues6.jpg",
+                title: "Vista Adicional",
+              },
+            ],
+          },
+        };
+
+        // Variables para la rotación automática
+        let autoRotationIntervals = {};
+        const AUTO_ROTATION_DELAY = 5000; // 5 segundos entre cambios
+
+        // Initialize Before/After Sliders
+        initializeComparisonSliders();
+
+        // Initialize Zone Navigation
+        initializeZoneNavigation();
+
+        // Initialize Gallery Navigation
+        initializeGalleryNavigation();
+
+        // Initialize Image Pair Navigation
+        initializePairNavigation();
+
+        // Initialize Lightbox
+        initializeLightbox();
+
+        // Initialize Global Galleries
+        initializeGlobalGalleries();
+
+        // Initial Zone Images
+        initializeZoneImages();
+
+        // Initialize pair counters
+        initializePairCounters();
+
+        // Iniciar rotación automática para todas las zonas
+        initializeAutoRotation();
+
+        // FUNCTION IMPLEMENTATIONS
+
+        // Función para iniciar la rotación automática
+        function initializeAutoRotation() {
+          Object.keys(zoneImagesData).forEach((zone) => {
+            startAutoRotation(zone);
+          });
+        }
+
+        // Función para iniciar la rotación automática para una zona específica
+        function startAutoRotation(zone) {
+          // Limpiar cualquier intervalo existente para esta zona
+          if (autoRotationIntervals[zone]) {
+            clearInterval(autoRotationIntervals[zone]);
+          }
+
+          const zoneData = zoneImagesData[zone];
+          if (!zoneData || !zoneData.pairs || zoneData.pairs.length <= 1)
+            return;
+
+          autoRotationIntervals[zone] = setInterval(() => {
+            // Solo rotar si este es el contenido actualmente visible
+            const zoneContent = document.getElementById(zone);
+            if (zoneContent && !zoneContent.classList.contains("hidden")) {
+              navigateComparisonPairs(zone, "next");
+            }
+          }, AUTO_ROTATION_DELAY);
+        }
+
+        // Función para detener la rotación automática
+        function stopAutoRotation(zone) {
+          if (autoRotationIntervals[zone]) {
+            clearInterval(autoRotationIntervals[zone]);
+            delete autoRotationIntervals[zone];
+          }
+        }
+
+        // Modificar la función navigateComparisonPairs para reiniciar el temporizador
+        function navigateComparisonPairs(zone, direction) {
+          const zoneContent = document.getElementById(zone);
+          if (!zoneContent) return;
+
+          const zoneData = zoneImagesData[zone];
+          if (!zoneData || !zoneData.pairs || zoneData.pairs.length <= 1)
+            return;
+
+          const activePair = zoneContent.querySelector(
+            ".pair-thumbnail.active"
+          );
+          if (!activePair) return;
+
+          const currentPairId = activePair.getAttribute("data-pair");
+          const currentIndex = zoneData.pairs.findIndex(
+            (p) => p.id === currentPairId
+          );
+
+          if (currentIndex === -1) return;
+
+          let newIndex;
+          if (direction === "prev") {
+            newIndex =
+              (currentIndex - 1 + zoneData.pairs.length) %
+              zoneData.pairs.length;
+          } else {
+            newIndex = (currentIndex + 1) % zoneData.pairs.length;
+          }
+
+          const newPair = zoneData.pairs[newIndex];
+          const newPairThumbnail = zoneContent.querySelector(
+            `.pair-thumbnail[data-pair="${newPair.id}"]`
+          );
+
+          if (newPairThumbnail) {
+            // Update active thumbnail
+            zoneContent
+              .querySelectorAll(".pair-thumbnail")
+              .forEach((btn) => btn.classList.remove("active"));
+            newPairThumbnail.classList.add("active");
+
+            // Add clear visual transition effect
+            const container = zoneContent.querySelector(
+              ".comparison-container"
+            );
+            if (container) {
+              container.style.transition = "opacity 0.2s ease";
+              container.style.opacity = "0.7";
+
+              // Scroll the thumbnail into view if needed
+              if (newPairThumbnail.scrollIntoView) {
+                newPairThumbnail.scrollIntoView({
+                  behavior: "smooth",
+                  block: "nearest",
+                  inline: "nearest",
+                });
+              }
+
+              setTimeout(() => {
+                // Load the new pair of images
+                loadComparisonImages(zone, newPair.before, newPair.after);
+
+                // Restore opacity
+                setTimeout(() => {
+                  container.style.opacity = "1";
+                }, 50);
+
+                // Update pair counter
+                updatePairCounter(zone, newIndex, zoneData.pairs.length);
+              }, 100);
+            } else {
+              // Fallback if container not found
+              loadComparisonImages(zone, newPair.before, newPair.after);
+              updatePairCounter(zone, newIndex, zoneData.pairs.length);
+            }
+
+            // Reiniciar el temporizador de rotación automática
+            if (autoRotationIntervals[zone]) {
+              stopAutoRotation(zone);
+              startAutoRotation(zone);
+            }
+          }
+        }
+
+        // Modificar la función initializeZoneNavigation para cambiar la rotación automática
+        function initializeZoneNavigation() {
+          const zoneButtons = document.querySelectorAll(".zone-thumbnail");
+          const zoneContents = document.querySelectorAll(".zone-content");
+
+          zoneButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              const zone = this.getAttribute("data-zone");
+
+              // Update active button
+              zoneButtons.forEach((btn) => btn.classList.remove("active"));
+              this.classList.add("active");
+
+              // Show corresponding content
+              zoneContents.forEach((content) => {
+                const contentZone = content.id;
+                if (contentZone === zone) {
+                  content.classList.remove("hidden");
+                  // Iniciar rotación para esta zona
+                  startAutoRotation(contentZone);
+                } else {
+                  content.classList.add("hidden");
+                  // Detener rotación para zonas ocultas
+                  stopAutoRotation(contentZone);
+                }
+              });
+            });
+          });
+        }
+
+        // Modificar la función initializePairNavigation para pausar la rotación en interacción
+        function initializePairNavigation() {
+          document.addEventListener("click", function (e) {
+            if (e.target.closest(".pair-thumbnail")) {
+              const pairButton = e.target.closest(".pair-thumbnail");
+              const zone = pairButton.closest(".zone-content").id;
+              const pairId = pairButton.getAttribute("data-pair");
+
+              // Pausar temporalmente la rotación automática
+              stopAutoRotation(zone);
+
+              // Update active button
+              const pairButtons = pairButton
+                .closest(".thumbnail-container")
+                .querySelectorAll(".pair-thumbnail");
+              pairButtons.forEach((btn) => btn.classList.remove("active"));
+              pairButton.classList.add("active");
+
+              // Load the appropriate images
+              const zoneData = zoneImagesData[zone];
+              if (zoneData) {
+                const pair = zoneData.pairs.find((p) => p.id === pairId);
+                if (pair) {
+                  loadComparisonImages(zone, pair.before, pair.after);
+
+                  // Update counter
+                  const pairIndex = zoneData.pairs.findIndex(
+                    (p) => p.id === pairId
+                  );
+                  if (pairIndex !== -1) {
+                    updatePairCounter(zone, pairIndex, zoneData.pairs.length);
+                  }
+                }
+              }
+
+              // Reiniciar la rotación después de un tiempo
+              setTimeout(() => {
+                startAutoRotation(zone);
+              }, AUTO_ROTATION_DELAY * 2);
+            }
+          });
+        }
+
+        // Modificar la función initializeComparisonSliders para pausar durante interacción
+        function initializeComparisonSliders() {
+          const sliders = document.querySelectorAll(".comparison-slider");
+
+          sliders.forEach((slider) => {
+            const container = slider.closest(".comparison-container");
+            const zone = container.closest(".zone-content").id;
+            const beforeImageClip =
+              container.querySelector(".before-image-clip");
+
+            // Initial position
+            let sliderPosition = 50;
+            beforeImageClip.style.width = sliderPosition + "%";
+            slider.style.left = sliderPosition + "%";
+
+            // Mouse drag functionality
+            let isDragging = false;
+
+            slider.addEventListener("mousedown", function (e) {
+              isDragging = true;
+              e.preventDefault();
+
+              // Pausar rotación durante la interacción
+              stopAutoRotation(zone);
+            });
+
+            document.addEventListener("mouseup", function () {
+              if (isDragging) {
+                isDragging = false;
+
+                // Reiniciar rotación después de soltar
+                setTimeout(() => {
+                  startAutoRotation(zone);
+                }, AUTO_ROTATION_DELAY);
+              }
+            });
+
+            document.addEventListener("mousemove", function (e) {
+              if (isDragging) {
+                const containerRect = container.getBoundingClientRect();
+                let newPosition =
+                  ((e.clientX - containerRect.left) / containerRect.width) *
+                  100;
+
+                // Limit position between 5% and 95%
+                newPosition = Math.max(5, Math.min(95, newPosition));
+
+                sliderPosition = newPosition;
+                beforeImageClip.style.width = sliderPosition + "%";
+                slider.style.left = sliderPosition + "%";
+              }
+            });
+
+            // Touch events for mobile
+            slider.addEventListener("touchstart", function (e) {
+              isDragging = true;
+
+              // Pausar rotación durante la interacción táctil
+              stopAutoRotation(zone);
+            });
+
+            document.addEventListener("touchend", function () {
+              if (isDragging) {
+                isDragging = false;
+
+                // Reiniciar rotación después de soltar
+                setTimeout(() => {
+                  startAutoRotation(zone);
+                }, AUTO_ROTATION_DELAY);
+              }
+            });
+
+            document.addEventListener("touchmove", function (e) {
+              if (isDragging) {
+                const containerRect = container.getBoundingClientRect();
+                const touch = e.touches[0];
+                let newPosition =
+                  ((touch.clientX - containerRect.left) / containerRect.width) *
+                  100;
+
+                newPosition = Math.max(5, Math.min(95, newPosition));
+
+                sliderPosition = newPosition;
+                beforeImageClip.style.width = sliderPosition + "%";
+                slider.style.left = sliderPosition + "%";
+
+                e.preventDefault();
+              }
+            });
+
+            // Add zoom hint to comparison container
+            const zoomHint = document.createElement("div");
+            zoomHint.className = "zoom-hint";
+            zoomHint.innerHTML = '<i class="fas fa-search-plus"></i>';
+            container.appendChild(zoomHint);
+
+            // Make comparison containers clickable to open lightbox
+            container.addEventListener("click", function () {
+              const zone = this.closest(".zone-content").id;
+              const zoneData = zoneImagesData[zone];
+
+              if (!zoneData) return;
+
+              const activePair = this.closest(".zone-content").querySelector(
+                ".pair-thumbnail.active"
+              );
+              const pairId = activePair
+                ? activePair.getAttribute("data-pair")
+                : "1";
+
+              // Find the matching pair
+              const pair = zoneData.pairs.find((p) => p.id === pairId);
+              if (!pair) return;
+
+              // Pausar rotación mientras el lightbox está abierto
+              stopAutoRotation(zone);
+
+              // Create gallery with before/after images
+              const gallery = [
+                {
+                  src: `imagenes/${zone}/${pair.before}`,
+                  caption: `ANTES - ${pair.title}`,
+                },
+                {
+                  src: `imagenes/${zone}/${pair.after}`,
+                  caption: `DESPUÉS - ${pair.title}`,
+                },
+              ];
+
+              // Open lightbox with the first image
+              openLightbox(gallery[0].src, gallery[0].caption, gallery, 0);
+            });
+
+            // Add navigation arrows for comparison pairs
+            const arrowLeft = container.querySelector(
+              ".comparison-slider-arrows .fa-chevron-left"
+            );
+            const arrowRight = container.querySelector(
+              ".comparison-slider-arrows .fa-chevron-right"
+            );
+
+            if (arrowLeft && arrowRight) {
+              const zone = container.closest(".zone-content").id;
+
+              // Navigate to previous pair
+              arrowLeft.addEventListener("click", function (e) {
+                e.stopPropagation(); // Prevent lightbox from opening
+                navigateComparisonPairs(zone, "prev");
+              });
+
+              // Navigate to next pair
+              arrowRight.addEventListener("click", function (e) {
+                e.stopPropagation(); // Prevent lightbox from opening
+                navigateComparisonPairs(zone, "next");
+              });
+            }
+          });
+        }
+
+        // Modificar la función initializeLightbox para reiniciar la rotación al cerrar
+        function initializeLightbox() {
+          const lightbox = document.getElementById("image-lightbox");
+          const lightboxImage = document.getElementById("lightbox-image");
+          const lightboxClose = document.getElementById("lightbox-close");
+          const lightboxPrev = document.getElementById("lightbox-prev");
+          const lightboxNext = document.getElementById("lightbox-next");
+
+          // Variable para almacenar la zona activa antes de abrir el lightbox
+          let activeZoneBeforeLightbox = null;
+
+          let currentGallery = [];
+          let currentIndex = 0;
+
+          // Close lightbox
+          lightboxClose.addEventListener("click", function () {
+            lightbox.classList.remove("open");
+            document.body.style.overflow = "";
+
+            // Reiniciar rotación para la zona activa cuando se cierra el lightbox
+            if (activeZoneBeforeLightbox) {
+              setTimeout(() => {
+                startAutoRotation(activeZoneBeforeLightbox);
+              }, 500);
+            }
+          });
+
+          // Click outside to close
+          lightbox.addEventListener("click", function (e) {
+            if (e.target === lightbox) {
+              lightbox.classList.remove("open");
+              document.body.style.overflow = "";
+
+              // Reiniciar rotación para la zona activa
+              if (activeZoneBeforeLightbox) {
+                setTimeout(() => {
+                  startAutoRotation(activeZoneBeforeLightbox);
+                }, 500);
+              }
+            }
+          });
+
+          // Keyboard navigation
+          document.addEventListener("keydown", function (e) {
+            if (!lightbox.classList.contains("open")) return;
+
+            if (e.key === "Escape") {
+              lightbox.classList.remove("open");
+              document.body.style.overflow = "";
+
+              // Reiniciar rotación para la zona activa
+              if (activeZoneBeforeLightbox) {
+                setTimeout(() => {
+                  startAutoRotation(activeZoneBeforeLightbox);
+                }, 500);
+              }
+            } else if (e.key === "ArrowLeft") {
+              navigateLightbox("prev");
+            } else if (e.key === "ArrowRight") {
+              navigateLightbox("next");
+            }
+          });
+
+          // Navigate to previous/next image
+          lightboxPrev.addEventListener("click", function () {
+            navigateLightbox("prev");
+          });
+
+          lightboxNext.addEventListener("click", function () {
+            navigateLightbox("next");
+          });
+
+          function navigateLightbox(direction) {
+            if (window.currentGallery.length <= 1) return;
+
+            if (direction === "prev") {
+              window.currentIndex =
+                (window.currentIndex - 1 + window.currentGallery.length) %
+                window.currentGallery.length;
+            } else {
+              window.currentIndex =
+                (window.currentIndex + 1) % window.currentGallery.length;
+            }
+
+            const item = window.currentGallery[window.currentIndex];
+            lightboxImage.src = item.src;
+            document.getElementById("lightbox-caption").textContent =
+              item.caption || "";
+          }
+
+          // Make window.openLightbox available for other functions
+          window.openLightbox = function (src, caption, gallery, index) {
+            lightboxImage.src = src;
+            document.getElementById("lightbox-caption").textContent =
+              caption || "";
+            window.currentGallery = gallery || [{ src, caption }];
+            window.currentIndex = index || 0;
+
+            // Guardar la zona activa antes de abrir el lightbox
+            const activeZone = document.querySelector(
+              ".zone-content:not(.hidden)"
+            );
+            if (activeZone) {
+              activeZoneBeforeLightbox = activeZone.id;
+            }
+
+            // Show/hide navigation buttons based on gallery length
+            if (window.currentGallery.length <= 1) {
+              lightboxPrev.style.display = "none";
+              lightboxNext.style.display = "none";
+            } else {
+              lightboxPrev.style.display = "flex";
+              lightboxNext.style.display = "flex";
+            }
+
+            lightbox.classList.add("open");
+            document.body.style.overflow = "hidden"; // Prevent scrolling when lightbox is open
+          };
+        }
+
+        // Function to add or update the pair counter
+        function updatePairCounter(zone, currentIndex, totalPairs) {
+          const container = document.querySelector(
+            `#${zone} .comparison-container`
+          );
+          if (!container) return;
+
+          let counter = container.querySelector(".pair-counter");
+
+          if (!counter) {
+            counter = document.createElement("div");
+            counter.className = "pair-counter";
+            container.appendChild(counter);
+          }
+
+          counter.textContent = `${currentIndex + 1} / ${totalPairs}`;
+        }
+
+        // Function to initialize pair counters
+        function initializePairCounters() {
+          Object.keys(zoneImagesData).forEach((zone) => {
+            const zoneData = zoneImagesData[zone];
+            if (zoneData && zoneData.pairs && zoneData.pairs.length > 0) {
+              // Make sure pair counters are visible for all sections, even those with a single pair
+              updatePairCounter(zone, 0, zoneData.pairs.length);
+
+              // Make sure the arrows are visible/hidden appropriately
+              const container = document.querySelector(
+                `#${zone} .comparison-container`
+              );
+              if (container) {
+                const arrowLeft = container.querySelector(
+                  ".comparison-slider-arrows .fa-chevron-left"
+                );
+                const arrowRight = container.querySelector(
+                  ".comparison-slider-arrows .fa-chevron-right"
+                );
+
+                if (arrowLeft && arrowRight) {
+                  // Mostrar siempre las flechas porque ahora todas las secciones tienen múltiples pares
+                  arrowLeft.style.visibility = "visible";
+                  arrowRight.style.visibility = "visible";
+                  arrowLeft.style.opacity = "1";
+                  arrowRight.style.opacity = "1";
+
+                  // Asegurar que los eventos click funcionan correctamente
+                  if (!arrowLeft.hasAttribute("data-initialized")) {
+                    arrowLeft.setAttribute("data-initialized", "true");
+                    arrowLeft.addEventListener("click", function (e) {
+                      e.stopPropagation();
+                      navigateComparisonPairs(zone, "prev");
+                    });
+
+                    arrowRight.addEventListener("click", function (e) {
+                      e.stopPropagation();
+                      navigateComparisonPairs(zone, "next");
+                    });
+                  }
+                }
+              }
+            }
+          });
+        }
+
+        // Zone Navigation
+        function initializeZoneNavigation() {
+          const zoneButtons = document.querySelectorAll(".zone-thumbnail");
+          const zoneContents = document.querySelectorAll(".zone-content");
+
+          zoneButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              const zone = this.getAttribute("data-zone");
+
+              // Update active button
+              zoneButtons.forEach((btn) => btn.classList.remove("active"));
+              this.classList.add("active");
+
+              // Show corresponding content
+              zoneContents.forEach((content) => {
+                if (content.id === zone) {
+                  content.classList.remove("hidden");
+                } else {
+                  content.classList.add("hidden");
+                }
+              });
+            });
+          });
+        }
+
+        // Gallery Navigation
+        function initializeGalleryNavigation() {
+          const galleryNavButtons = document.querySelectorAll(
+            ".gallery-nav-button"
+          );
+
+          galleryNavButtons.forEach((button) => {
+            button.addEventListener("click", function () {
+              const view = this.getAttribute("data-view");
+              const zone = this.closest(".zone-content").id;
+
+              // Update active button
+              const zoneButtons = this.closest(
+                ".zone-content"
+              ).querySelectorAll(".gallery-nav-button");
+              zoneButtons.forEach((btn) => btn.classList.remove("active"));
+              this.classList.add("active");
+
+              // Show/hide appropriate elements
+              const comparisonContainer = document.querySelector(
+                `#${zone} .comparison-container`
+              );
+              const thumbnailSection = document
+                .querySelector(`#${zone} .thumbnail-container`)
+                .closest("div");
+              const beforeGallery = document.getElementById(
+                `${zone}-before-gallery`
+              );
+              const afterGallery = document.getElementById(
+                `${zone}-after-gallery`
+              );
+
+              if (view === "comparison") {
+                comparisonContainer.classList.remove("hidden");
+                thumbnailSection.classList.remove("hidden");
+                beforeGallery.classList.add("hidden");
+                afterGallery.classList.add("hidden");
+              } else if (view === "before") {
+                comparisonContainer.classList.add("hidden");
+                thumbnailSection.classList.add("hidden");
+                beforeGallery.classList.remove("hidden");
+                afterGallery.classList.add("hidden");
+              } else if (view === "after") {
+                comparisonContainer.classList.add("hidden");
+                thumbnailSection.classList.add("hidden");
+                beforeGallery.classList.add("hidden");
+                afterGallery.classList.remove("hidden");
+              }
+            });
+          });
+        }
+
+        // Pair Navigation
+        function initializePairNavigation() {
+          document.addEventListener("click", function (e) {
+            if (e.target.closest(".pair-thumbnail")) {
+              const pairButton = e.target.closest(".pair-thumbnail");
+              const zone = pairButton.closest(".zone-content").id;
+              const pairId = pairButton.getAttribute("data-pair");
+
+              // Update active button
+              const pairButtons = pairButton
+                .closest(".thumbnail-container")
+                .querySelectorAll(".pair-thumbnail");
+              pairButtons.forEach((btn) => btn.classList.remove("active"));
+              pairButton.classList.add("active");
+
+              // Load the appropriate images
+              const zoneData = zoneImagesData[zone];
+              if (zoneData) {
+                const pair = zoneData.pairs.find((p) => p.id === pairId);
+                if (pair) {
+                  loadComparisonImages(zone, pair.before, pair.after);
+                }
+              }
+            }
+          });
+        }
+
+        // Lightbox Functionality
+        function initializeLightbox() {
+          const lightbox = document.getElementById("image-lightbox");
+          const lightboxImage = document.getElementById("lightbox-image");
+          const lightboxClose = document.getElementById("lightbox-close");
+          const lightboxPrev = document.getElementById("lightbox-prev");
+          const lightboxNext = document.getElementById("lightbox-next");
+
+          let currentGallery = [];
+          let currentIndex = 0;
+
+          // Close lightbox
+          lightboxClose.addEventListener("click", function () {
+            lightbox.classList.remove("open");
+            document.body.style.overflow = "";
+          });
+
+          // Click outside to close
+          lightbox.addEventListener("click", function (e) {
+            if (e.target === lightbox) {
+              lightbox.classList.remove("open");
+              document.body.style.overflow = "";
+            }
+          });
+
+          // Keyboard navigation
+          document.addEventListener("keydown", function (e) {
+            if (!lightbox.classList.contains("open")) return;
+
+            if (e.key === "Escape") {
+              lightbox.classList.remove("open");
+              document.body.style.overflow = "";
+            } else if (e.key === "ArrowLeft") {
+              navigateLightbox("prev");
+            } else if (e.key === "ArrowRight") {
+              navigateLightbox("next");
+            }
+          });
+
+          // Navigate to previous/next image
+          lightboxPrev.addEventListener("click", function () {
+            navigateLightbox("prev");
+          });
+
+          lightboxNext.addEventListener("click", function () {
+            navigateLightbox("next");
+          });
+
+          function navigateLightbox(direction) {
+            if (window.currentGallery.length <= 1) return;
+
+            if (direction === "prev") {
+              window.currentIndex =
+                (window.currentIndex - 1 + window.currentGallery.length) %
+                window.currentGallery.length;
+            } else {
+              window.currentIndex =
+                (window.currentIndex + 1) % window.currentGallery.length;
+            }
+
+            const item = window.currentGallery[window.currentIndex];
+            lightboxImage.src = item.src;
+            document.getElementById("lightbox-caption").textContent =
+              item.caption || "";
+          }
+
+          // Make window.openLightbox available for other functions
+          window.openLightbox = function (src, caption, gallery, index) {
+            lightboxImage.src = src;
+            document.getElementById("lightbox-caption").textContent =
+              caption || "";
+            window.currentGallery = gallery || [{ src, caption }];
+            window.currentIndex = index || 0;
+
+            // Show/hide navigation buttons based on gallery length
+            if (window.currentGallery.length <= 1) {
+              lightboxPrev.style.display = "none";
+              lightboxNext.style.display = "none";
+            } else {
+              lightboxPrev.style.display = "flex";
+              lightboxNext.style.display = "flex";
+            }
+
+            lightbox.classList.add("open");
+            document.body.style.overflow = "hidden"; // Prevent scrolling when lightbox is open
+          };
+        }
+
+        // Global Galleries
+        function initializeGlobalGalleries() {
+          const enlaceTodasAntes =
+            document.getElementById("enlace-todas-antes");
+          const enlaceTodasDespues = document.getElementById(
+            "enlace-todas-despues"
+          );
+          const seccionTodasAntes = document.getElementById(
+            "todas-imagenes-antes"
+          );
+          const seccionTodasDespues = document.getElementById(
+            "todas-imagenes-despues"
+          );
+          const cerrarTodasAntesFlotante = document.getElementById(
+            "cerrar-todas-antes-flotante"
+          );
+          const cerrarTodasDespuesFlotante = document.getElementById(
+            "cerrar-todas-despues-flotante"
+          );
+          const mainContent = document.querySelector("main");
+          const footer = document.querySelector("footer");
+
+          // Eventos para mostrar todas las imágenes
+          enlaceTodasAntes.addEventListener("click", function (e) {
+            e.preventDefault();
+            mainContent.classList.add("hidden");
+            footer.classList.add("hidden");
+            seccionTodasDespues.classList.add("hidden");
+            seccionTodasAntes.classList.remove("hidden");
+            window.scrollTo(0, 0);
+          });
+
+          enlaceTodasDespues.addEventListener("click", function (e) {
+            e.preventDefault();
+            mainContent.classList.add("hidden");
+            footer.classList.add("hidden");
+            seccionTodasAntes.classList.add("hidden");
+            seccionTodasDespues.classList.remove("hidden");
+            window.scrollTo(0, 0);
+          });
+
+          // Botones flotantes para cerrar las galerías
+          cerrarTodasAntesFlotante.addEventListener("click", function () {
+            seccionTodasAntes.classList.add("hidden");
+            mainContent.classList.remove("hidden");
+            footer.classList.remove("hidden");
+          });
+
+          cerrarTodasDespuesFlotante.addEventListener("click", function () {
+            seccionTodasDespues.classList.add("hidden");
+            mainContent.classList.remove("hidden");
+            footer.classList.remove("hidden");
+          });
+
+          // Populate global galleries
+          populateGlobalGalleries();
+        }
+
+        // Populate All Images Galleries
+        function populateGlobalGalleries() {
+          const todasAntes = [];
+          const todasDespues = [];
+
+          // Collect all before and after images from all zones
+          Object.keys(zoneImagesData).forEach((zone) => {
+            const zoneData = zoneImagesData[zone];
+
+            // Add before images with zone info
+            zoneData.before.forEach((img) => {
+              todasAntes.push({
+                id: img.id,
+                file: `${zone}/${img.file}`,
+                title: `${capitalizeFirstLetter(zone)} - ${img.title}`,
+              });
+            });
+
+            // Add after images with zone info
+            zoneData.after.forEach((img) => {
+              todasDespues.push({
+                id: img.id,
+                file: `${zone}/${img.file}`,
+                title: `${capitalizeFirstLetter(zone)} - ${img.title}`,
+              });
+            });
+          });
+
+          // Populate the galleries
+          populateGalleryGrid("grid-todas-antes", todasAntes);
+          populateGalleryGrid("grid-todas-despues", todasDespues);
+        }
+
+        // Populate Gallery Grid
+        function populateGalleryGrid(gridId, images) {
+          const grid = document.getElementById(gridId);
+          if (!grid) return;
+
+          grid.innerHTML = "";
+
+          // Create gallery items array for lightbox navigation
+          const galleryItems = images.map((img) => ({
+            src: `imagenes/${img.file}`,
+            caption: img.title,
+          }));
+
+          images.forEach((img, index) => {
+            const item = document.createElement("div");
+            item.className =
+              "gallery-item h-64 rounded-lg overflow-hidden shadow-md";
+            item.style.backgroundImage = `url('imagenes/${img.file}')`;
+
+            const label = document.createElement("div");
+            label.className = "gallery-item-label";
+            label.textContent = img.title;
+
+            item.appendChild(label);
+            grid.appendChild(item);
+
+            // Add click event to open lightbox
+            item.addEventListener("click", function () {
+              openLightbox(
+                `imagenes/${img.file}`,
+                img.title,
+                galleryItems,
+                index
+              );
+            });
+          });
+        }
+
+        // Initialize Zone Images
+        function initializeZoneImages() {
+          Object.keys(zoneImagesData).forEach((zone) => {
+            if (document.getElementById(zone)) {
+              const zoneData = zoneImagesData[zone];
+
+              // Load the first pair of images
+              if (zoneData.pairs && zoneData.pairs.length > 0) {
+                const firstPair = zoneData.pairs[0];
+                loadComparisonImages(zone, firstPair.before, firstPair.after);
+              }
+
+              // Setup pair thumbnails
+              if (zoneData.pairs) {
+                setupComparisonPairs(zone, zoneData.pairs);
+              }
+
+              // Populate before/after galleries
+              if (zoneData.before) {
+                populateGallery(
+                  `${zone}-before-gallery`,
+                  zone,
+                  zoneData.before
+                );
+              }
+
+              if (zoneData.after) {
+                populateGallery(`${zone}-after-gallery`, zone, zoneData.after);
+              }
+
+              // Set zone thumbnail
+              if (zoneData.after && zoneData.after.length > 0) {
+                const zoneButton = document.querySelector(
+                  `.zone-thumbnail[data-zone="${zone}"]`
+                );
+                if (zoneButton) {
+                  const zoneThumbnailImg = new Image();
+                  zoneThumbnailImg.onload = function () {
+                    zoneButton.style.backgroundImage = `url('imagenes/${zone}/${zoneData.after[0].file}')`;
+                    zoneButton.style.backgroundSize = "cover";
+                  };
+
+                  zoneThumbnailImg.onerror = function () {
+                    console.error(
+                      `Failed to load zone thumbnail: imagenes/${zone}/${zoneData.after[0].file}`
+                    );
+                    // Leave default styling
+                  };
+
+                  zoneThumbnailImg.src = `imagenes/${zone}/${zoneData.after[0].file}`;
+                }
+              }
+            }
+          });
+        }
+
+        // Setup comparison pairs thumbnails
+        function setupComparisonPairs(zone, pairs) {
+          const container = document.querySelector(
+            `#${zone} .thumbnail-container`
+          );
+          if (!container) return;
+
+          container.innerHTML = "";
+
+          pairs.forEach((pair) => {
+            const thumbnail = document.createElement("div");
+            thumbnail.className = "pair-thumbnail";
+            thumbnail.setAttribute("data-pair", pair.id);
+            if (pair.id === "1") thumbnail.classList.add("active");
+
+            const title = document.createElement("div");
+            title.className = "zone-title text-xs";
+            title.textContent = pair.title;
+
+            thumbnail.appendChild(title);
+            container.appendChild(thumbnail);
+
+            // Set background image with error handling
+            const thumbImg = new Image();
+            thumbImg.onload = function () {
+              thumbnail.style.backgroundImage = `url('imagenes/${zone}/${pair.after}')`;
+              thumbnail.style.backgroundSize = "cover";
+            };
+
+            thumbImg.onerror = function () {
+              console.error(
+                `Failed to load thumbnail image: imagenes/${zone}/${pair.after}`
+              );
+              // Use a placeholder color instead
+              thumbnail.style.backgroundColor = "#e2e8f0";
+              thumbnail.style.backgroundImage = "none";
+            };
+
+            thumbImg.src = `imagenes/${zone}/${pair.after}`;
+          });
+        }
+
+        // Populate gallery
+        function populateGallery(galleryId, zone, images) {
+          const gallery = document.getElementById(galleryId);
+          if (!gallery) return;
+
+          gallery.innerHTML = "";
+
+          const galleryItems = images.map((img) => ({
+            src: `imagenes/${zone}/${img.file}`,
+            caption: img.title,
+          }));
+
+          images.forEach((img, index) => {
+            const item = document.createElement("div");
+            item.className = "gallery-item";
+            item.style.backgroundImage = `url('imagenes/${zone}/${img.file}')`;
+
+            const label = document.createElement("div");
+            label.className = "gallery-item-label";
+            label.textContent = img.title;
+
+            item.appendChild(label);
+            gallery.appendChild(item);
+
+            // Add click event to open lightbox
+            item.addEventListener("click", function () {
+              openLightbox(
+                `imagenes/${zone}/${img.file}`,
+                img.title,
+                galleryItems,
+                index
+              );
+            });
+          });
+        }
+
+        // Load comparison images
+        function loadComparisonImages(zone, beforeFileName, afterFileName) {
+          const zoneContent = document.getElementById(zone);
+          if (!zoneContent) return;
+
+          const beforeImage = zoneContent.querySelector(".before-image");
+          const afterImage = zoneContent.querySelector(".after-image");
+
+          if (beforeImage && afterImage) {
+            // Set default text in case images fail to load
+            beforeImage.textContent = "";
+            afterImage.textContent = "";
+
+            // Create image objects to verify loading
+            const beforeImg = new Image();
+            const afterImg = new Image();
+
+            beforeImg.onload = function () {
+              beforeImage.style.backgroundImage = `url('imagenes/${zone}/${beforeFileName}')`;
+              beforeImage.textContent = ""; // Clear text when image loads
+            };
+
+            beforeImg.onerror = function () {
+              console.error(
+                `Failed to load before image: imagenes/${zone}/${beforeFileName}`
+              );
+              beforeImage.textContent = "Imagen ANTES de la remodelación";
+              beforeImage.style.backgroundImage = "none";
+            };
+
+            afterImg.onload = function () {
+              afterImage.style.backgroundImage = `url('imagenes/${zone}/${afterFileName}')`;
+              afterImage.textContent = ""; // Clear text when image loads
+            };
+
+            afterImg.onerror = function () {
+              console.error(
+                `Failed to load after image: imagenes/${zone}/${afterFileName}`
+              );
+              afterImage.textContent = "Imagen DESPUÉS de la remodelación";
+              afterImage.style.backgroundImage = "none";
+            };
+
+            // Start loading the images
+            beforeImg.src = `imagenes/${zone}/${beforeFileName}`;
+            afterImg.src = `imagenes/${zone}/${afterFileName}`;
+          }
+        }
+
+        // Helper: Capitalize first letter
+        function capitalizeFirstLetter(string) {
+          return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+      });
+    </script>
+  </body>
+</html>
