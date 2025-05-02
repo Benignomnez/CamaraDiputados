@@ -24,9 +24,9 @@
   <body class="pb-12 bg-gray-50">
     <header class="bg-white shadow-lg py-6 mb-8 border-t-4 border-blue-600">
       <div class="container mx-auto px-4">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row justify-between items-center">
           <div
-            class="h-16 w-auto transform transition-transform duration-300 hover:scale-105"
+            class="h-14 sm:h-16 w-auto transform transition-transform duration-300 hover:scale-105 mb-4 sm:mb-0"
           >
             <img
               src="imagenes/logo/hastial.jpeg"
@@ -35,7 +35,7 @@
             />
           </div>
           <div
-            class="h-16 w-auto transform transition-transform duration-300 hover:scale-105"
+            class="h-14 sm:h-16 w-auto transform transition-transform duration-300 hover:scale-105"
           >
             <img
               src="imagenes/logo/logocamaradiputados.jpg"
@@ -46,27 +46,31 @@
         </div>
         <div class="mt-8 text-center">
           <h1
-            class="text-4xl md:text-5xl font-bold text-gray-800 mb-2 leading-tight"
+            class="text-3xl sm:text-4xl md:text-5xl font-bold text-gray-800 mb-2 leading-tight"
           >
             Proyecto de <span class="text-blue-600">Remodelación</span>
           </h1>
-          <p class="text-lg text-gray-600 mt-2 max-w-3xl mx-auto font-light">
+          <p
+            class="text-base sm:text-lg text-gray-600 mt-2 max-w-3xl mx-auto font-light"
+          >
             Departamento de Compras y Contrataciones - Cámara de Diputados de la
             República Dominicana
           </p>
           <!-- Enlaces rápidos a las galerías -->
-          <div class="mt-6 flex justify-center space-x-4">
+          <div
+            class="mt-6 flex flex-col sm:flex-row justify-center space-y-3 sm:space-y-0 sm:space-x-4"
+          >
             <a
               href="#todas-imagenes-antes"
               id="enlace-todas-antes"
-              class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
+              class="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
             >
               <i class="fas fa-images mr-2"></i> Imágenes Antes
             </a>
             <a
               href="#todas-imagenes-despues"
               id="enlace-todas-despues"
-              class="inline-block bg-gray-700 hover:bg-gray-800 text-white font-medium py-3 px-8 rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
+              class="inline-block bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 sm:py-3 px-6 sm:px-8 rounded-full transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg"
             >
               <i class="fas fa-images mr-2"></i> Imágenes Después
             </a>
@@ -1305,6 +1309,12 @@
           <i class="fas fa-chevron-right"></i>
         </div>
       </div>
+      <div class="lightbox-spinner"></div>
+    </div>
+
+    <!-- Add scroll to top button for mobile -->
+    <div class="scroll-to-top" id="scroll-to-top">
+      <i class="fas fa-arrow-up"></i>
     </div>
 
     <!-- JavaScript Files -->

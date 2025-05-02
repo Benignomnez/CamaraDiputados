@@ -382,13 +382,6 @@ p {
   visibility: visible;
 }
 
-.lightbox-content {
-  position: relative;
-  max-width: 90%;
-  max-height: 90%;
-  margin: auto;
-}
-
 .lightbox-image {
   max-width: 100%;
   max-height: 90vh;
@@ -396,6 +389,11 @@ p {
   margin: 0 auto;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
   border-radius: 4px;
+  transition: opacity 0.3s ease;
+}
+
+.lightbox-image.loading {
+  opacity: 0.5;
 }
 
 .lightbox-close {
@@ -485,6 +483,32 @@ p {
   z-index: 5;
 }
 
+/* Mobile improvements for lightbox navigation */
+@media (max-width: 576px) {
+  .lightbox-nav-btn {
+    width: 35px;
+    height: 35px;
+    opacity: 0.8;
+    font-size: 16px;
+  }
+
+  .lightbox-caption {
+    padding: 8px;
+    font-size: 14px;
+  }
+
+  .lightbox-image {
+    max-height: 80vh;
+  }
+}
+
+/* Disable double-tap to zoom on mobile devices */
+@media (pointer: coarse) {
+  .lightbox-image {
+    touch-action: pan-y;
+  }
+}
+
 @media print {
   .zone-thumbnail,
   .pair-thumbnail {
@@ -511,5 +535,221 @@ p {
   }
   .lightbox-content {
     max-width: 95%;
+  }
+
+  /* Improved mobile styling */
+  .comparison-container {
+    height: 300px;
+  }
+
+  .comparison-slider-arrows i {
+    width: 30px;
+    height: 30px;
+    font-size: 14px;
+  }
+
+  .zone-description {
+    padding: 15px;
+  }
+
+  .pair-thumbnail {
+    width: 100px;
+    height: 70px;
+    flex-shrink: 0;
+  }
+
+  .image-tag {
+    font-size: 12px;
+    padding: 3px 8px;
+  }
+
+  .section-title {
+    font-size: 1.5rem;
+  }
+
+  .lightbox-close {
+    top: 10px;
+    right: 10px;
+  }
+}
+
+/* Add smaller screen breakpoint */
+@media (max-width: 576px) {
+  .comparison-container {
+    height: 250px;
+  }
+
+  .gallery-item {
+    flex: 0 0 100%;
+    height: 200px;
+  }
+
+  .gallery-nav-button {
+    font-size: 0.8rem;
+    padding: 4px 10px;
+  }
+
+  .comparison-slider::after {
+    width: 32px;
+    height: 32px;
+  }
+
+  .comparison-slider-arrows i {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .section-title {
+    font-size: 1.3rem;
+  }
+
+  .lightbox-nav-btn {
+    width: 35px;
+    height: 35px;
+    font-size: 18px;
+    margin: 0 5px;
+  }
+
+  .image-tag {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  h1 {
+    font-size: 1.8rem !important;
+  }
+
+  h2 {
+    font-size: 1.4rem !important;
+  }
+
+  /* Fix zoom hint positioning */
+  .zoom-hint {
+    top: 5px;
+    right: 5px;
+    width: 25px;
+    height: 25px;
+    font-size: 12px;
+  }
+
+  /* Improve gallery filter tabs scrolling on small screens */
+  .filter-tab {
+    font-size: 0.7rem;
+    padding: 2px 6px;
+    margin-right: 2px;
+  }
+}
+
+/* Make touch targets larger on mobile */
+@media (max-width: 768px) and (pointer: coarse) {
+  .comparison-slider::after {
+    width: 40px;
+    height: 40px;
+  }
+
+  .zone-thumbnail {
+    min-height: 60px;
+  }
+
+  .lightbox-nav-btn {
+    width: 40px;
+    height: 40px;
+    opacity: 0.8;
+  }
+
+  /* Add fixed button to scroll to top on mobile */
+  .scroll-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 40px;
+    height: 40px;
+    background-color: var(--primary-gray);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .scroll-to-top.visible {
+    opacity: 0.8;
+  }
+}
+
+.filter-tab.active-touch {
+  background-color: #dbeafe !important;
+  color: #1e40af !important;
+  transform: scale(0.98);
+}
+
+/* Fix mobile horizontal scroll issues */
+html,
+body {
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Make sidebar fixed on very small screens */
+@media (max-width: 425px) {
+  .md\:w-1\/4 {
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .gallery-nav-button {
+    font-size: 0.75rem;
+    padding: 3px 8px;
+  }
+
+  .zone-title {
+    font-size: 10px;
+  }
+
+  /* Fix image sizing on small screens */
+  .comparison-container {
+    height: 200px;
+  }
+
+  /* Prevent text overflow */
+  .zone-description p,
+  .zone-description li {
+    font-size: 0.9rem;
+  }
+}
+
+/* Loading spinner */
+.lightbox-spinner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.2);
+  border-top-color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  animation: spin 1s infinite linear;
+  z-index: 1002;
+}
+
+.lightbox-image.loading ~ .lightbox-spinner {
+  opacity: 1;
+  visibility: visible;
+}
+
+@keyframes spin {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
   }
 }

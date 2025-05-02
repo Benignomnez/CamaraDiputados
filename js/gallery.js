@@ -30,9 +30,72 @@ document.addEventListener("DOMContentLoaded", function () {
     // Initialize Filter Tabs
     initializeFilterTabs();
 
+    // Initialize scroll to top button
+    initializeScrollToTopButton();
+
+    // Make thumbnails touch-friendly
+    initializeTouchFriendlyThumbnails();
+
     // Start automatic rotation for all zones
     initializeAutoRotation();
 });
+
+// Initialize scroll to top button
+function initializeScrollToTopButton() {
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+
+    if (!scrollToTopBtn) return;
+
+    // Show button when user scrolls down 300px
+    window.addEventListener('scroll', function () {
+        if (window.pageYOffset > 300) {
+            scrollToTopBtn.classList.add('visible');
+        } else {
+            scrollToTopBtn.classList.remove('visible');
+        }
+    });
+
+    // Scroll to top when button is clicked
+    scrollToTopBtn.addEventListener('click', function () {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+}
+
+// Function to make thumbnails more touch-friendly
+function initializeTouchFriendlyThumbnails() {
+    // Improve thumbnail containers scrolling on mobile
+    const thumbnailContainers = document.querySelectorAll('.thumbnail-container');
+
+    thumbnailContainers.forEach(container => {
+        // Add momentum scrolling for iOS
+        container.style.webkitOverflowScrolling = 'touch';
+
+        // Make the right arrow button functional
+        const rightArrow = container.parentElement.querySelector('.fa-chevron-right');
+        if (rightArrow) {
+            rightArrow.addEventListener('click', function () {
+                container.scrollBy({
+                    left: 200,
+                    behavior: 'smooth'
+                });
+            });
+        }
+    });
+
+    // Improve filter tabs scrolling on mobile
+    const filterContainers = document.querySelectorAll('.filter-tab').forEach(tab => {
+        tab.addEventListener('touchstart', function () {
+            this.classList.add('active-touch');
+        });
+
+        tab.addEventListener('touchend', function () {
+            this.classList.remove('active-touch');
+        });
+    });
+}
 
 // Function to initialize the filter tabs functionality
 function initializeFilterTabs() {
@@ -90,6 +153,16 @@ function filterGalleryImages(category, section) {
                         zone: category
                     });
                 });
+            }
+        }
+
+        // Display filtered count in the UI
+        const activeTab = document.querySelector(`.filter-tab[data-category="${category}"][data-section="${section}"].active`);
+        if (activeTab) {
+            // Update count if needed
+            const countText = images.length > 0 ? `(${images.length})` : '(0)';
+            if (!activeTab.textContent.includes(countText)) {
+                activeTab.textContent = `${category === 'todas' ? 'Todas' : capitalizeFirstLetter(category)} ${countText}`;
             }
         }
 
@@ -229,6 +302,16 @@ function initializeZoneNavigation() {
                     content.classList.remove("hidden");
                     // Start rotation for this zone
                     startAutoRotation(contentZone);
+
+                    // Scroll to top of content on mobile
+                    if (window.innerWidth < 768) {
+                        setTimeout(() => {
+                            content.scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'start'
+                            });
+                        }, 100);
+                    }
                 } else {
                     content.classList.add("hidden");
                     // Stop rotation for hidden zones
@@ -348,6 +431,9 @@ function initializeComparisonSliders() {
 
             // Pause rotation during touch interaction
             stopAutoRotation(zone);
+
+            // Prevent page scrolling when interacting with slider
+            e.preventDefault();
         });
 
         document.addEventListener("touchend", function () {
@@ -374,6 +460,7 @@ function initializeComparisonSliders() {
                 beforeImageClip.style.width = sliderPosition + "%";
                 slider.style.left = sliderPosition + "%";
 
+                // Prevent page scrolling when dragging
                 e.preventDefault();
             }
         });
@@ -452,9 +539,17 @@ function initializeLightbox() {
     const lightboxClose = document.getElementById("lightbox-close");
     const lightboxPrev = document.getElementById("lightbox-prev");
     const lightboxNext = document.getElementById("lightbox-next");
+    const lightboxCaption = document.getElementById("lightbox-caption");
 
     // Variable to store the active zone before opening lightbox
     let activeZoneBeforeLightbox = null;
+
+    // Variables for touch navigation
+    let touchStartX = 0;
+    let touchEndX = 0;
+
+    // Add loading state for images
+    let isImageLoading = false;
 
     // Close lightbox
     lightboxClose.addEventListener("click", function () {
@@ -514,27 +609,81 @@ function initializeLightbox() {
         navigateLightbox("next");
     });
 
-    function navigateLightbox(direction) {
-        if (window.currentGallery.length <= 1) return;
+    // Touch events for mobile swipe
+    lightboxImage.addEventListener("touchstart", function (e) {
+        touchStartX = e.changedTouches[0].screenX;
+    });
 
+    lightboxImage.addEventListener("touchend", function (e) {
+        touchEndX = e.changedTouches[0].screenX;
+        handleSwipe();
+    });
+
+    function handleSwipe() {
+        // If swipe is long enough, navigate accordingly
+        const swipeThreshold = 50;
+        if (touchEndX < touchStartX - swipeThreshold) {
+            // Swipe left (next)
+            navigateLightbox("next");
+        } else if (touchEndX > touchStartX + swipeThreshold) {
+            // Swipe right (prev)
+            navigateLightbox("prev");
+        }
+    }
+
+    function navigateLightbox(direction) {
+        if (!window.currentGallery || window.currentGallery.length <= 1 || isImageLoading) return;
+
+        isImageLoading = true;
+
+        // Add loading class to the image
+        lightboxImage.classList.add('loading');
+
+        let newIndex;
         if (direction === "prev") {
-            window.currentIndex =
+            newIndex =
                 (window.currentIndex - 1 + window.currentGallery.length) %
                 window.currentGallery.length;
         } else {
-            window.currentIndex =
+            newIndex =
                 (window.currentIndex + 1) % window.currentGallery.length;
         }
 
+        window.currentIndex = newIndex;
         const item = window.currentGallery[window.currentIndex];
-        lightboxImage.src = item.src;
-        document.getElementById("lightbox-caption").textContent = item.caption || "";
+
+        // Preload the image to ensure smooth transitions
+        const preloadImg = new Image();
+        preloadImg.onload = function () {
+            lightboxImage.src = item.src;
+            lightboxCaption.textContent = item.caption || "";
+
+            // Remove loading state after a short delay
+            setTimeout(() => {
+                lightboxImage.classList.remove('loading');
+                isImageLoading = false;
+            }, 200);
+        };
+
+        preloadImg.onerror = function () {
+            // If image fails to load, still update src and remove loading state
+            lightboxImage.src = item.src;
+            lightboxCaption.textContent = item.caption || "";
+            lightboxImage.classList.remove('loading');
+            isImageLoading = false;
+        };
+
+        preloadImg.src = item.src;
     }
 
     // Make window.openLightbox available for other functions
     window.openLightbox = function (src, caption, gallery, index) {
+        // Reset loading state
+        isImageLoading = false;
+        lightboxImage.classList.remove('loading');
+
         lightboxImage.src = src;
-        document.getElementById("lightbox-caption").textContent = caption || "";
+        lightboxCaption.textContent = caption || "";
         window.currentGallery = gallery || [{ src, caption }];
         window.currentIndex = index || 0;
 
@@ -770,12 +919,18 @@ function populateGalleryGrid(gridId, images) {
         return;
     }
 
+    // Create gallery items array for lightbox navigation
+    const galleryItems = images.map((image) => ({
+        src: `imagenes/${image.zone}/${image.file}`,
+        caption: `${image.title} - ${capitalizeFirstLetter(image.zone)}`
+    }));
+
     // Create gallery items
-    images.forEach((image) => {
+    images.forEach((image, index) => {
         const itemDiv = document.createElement('div');
         itemDiv.className = 'gallery-item relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-105';
         itemDiv.setAttribute('data-zone', image.zone || '');
-        itemDiv.style.height = '240px';
+        itemDiv.style.height = window.innerWidth < 576 ? '200px' : '240px';
 
         // Set background image
         const imgPath = `imagenes/${image.zone}/${image.file}`;
@@ -795,15 +950,10 @@ function populateGalleryGrid(gridId, images) {
         zoomHint.innerHTML = '<i class="fas fa-search-plus"></i>';
         itemDiv.appendChild(zoomHint);
 
-        // Add click event to open in lightbox
+        // Add click event to open in lightbox WITH proper gallery navigation
         itemDiv.addEventListener('click', function () {
-            const lightbox = document.getElementById('image-lightbox');
-            const lightboxImage = document.getElementById('lightbox-image');
-            const lightboxCaption = document.getElementById('lightbox-caption');
-
-            lightboxImage.src = imgPath;
-            lightboxCaption.textContent = image.title;
-            lightbox.classList.add('open');
+            // Use the openLightbox function with the entire gallery
+            openLightbox(imgPath, `${image.title} - ${capitalizeFirstLetter(image.zone)}`, galleryItems, index);
         });
 
         grid.appendChild(itemDiv);
